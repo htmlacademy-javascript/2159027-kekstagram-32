@@ -1,21 +1,12 @@
-const getLengthString = (string, maxLength) => {
-  if (string.length <= maxLength) {
-    return true;
-  }
-  return false;
+const getStringLength = (str, maxLength) => str.length <= maxLength;
+
+getStringLength('Hello,JavaScript!', 2);
+
+
+const isPalindrome = (string) => {
+  const cleaned = string.toLowerCase().replaceAll(' ', '');
+  const reversed = cleaned.split('').reverse().join('');
+  return cleaned === reversed;
 };
 
-getLengthString('Hello,JavaScript!', 2);
-
-
-const palindrom = (string) => {
-  const checkString = '';
-  let trimString = checkString.toLowerCase().replaceAll();
-  for (let i = trimString.length - 1; i >= 0; i--) {
-    trimString += string[i];
-  }
-  return trimString === checkString;
-};
-
-palindrom('Лёша на полке клопа нашёл ');
 

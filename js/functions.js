@@ -9,4 +9,4 @@ const isPalindrome = (string) => {
   return cleaned === reversed;
 };
 
-
+isPalindrome('Anna ');

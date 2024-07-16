@@ -1,5 +1,5 @@
 import {getPhoto} from './data.js';
-import './show-photo.js';
+import './thumbnail.js';
 
 getPhoto();
 

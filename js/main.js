@@ -1,6 +1,7 @@
 import {getPhoto} from './data.js';
 import {generateThumbnailItems} from './thumbnail.js';
+import {initUserModal} from './user-modal.js';
 
-generateThumbnailItems(getPhoto());
-
-
+const photos = getPhoto();
+generateThumbnailItems(photos);
+initUserModal(photos);

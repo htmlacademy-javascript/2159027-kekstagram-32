@@ -6,7 +6,7 @@ const LIKE_MAX_COUNT = 200;
 const COMMENT_MIN_COUNT = 0;
 const COMMENT_MAX_COUNT = 30;
 const AVATAR_MIN_COUNT = 1;
-const AVATAR_MAX_COUNT = 1;
+const AVATAR_MAX_COUNT = 6;
 const MESSAGE_MIN_COUNT = 1;
 const MESSAGE_MAX_COUNT = 2;
 
@@ -58,5 +58,4 @@ const getPhoto = () => Array.from(
 );
 
 export {getPhoto};
-
 

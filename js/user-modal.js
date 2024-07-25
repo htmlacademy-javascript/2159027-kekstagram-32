@@ -1,46 +1,33 @@
 import {isEscapeKey} from './util.js';
 
+const bodyElement = document.querySelector('body');
+
+/** Элемент модального окна для полноэкранного просмотра изображения */
 const userModalElement = document.querySelector('.big-picture');
+/**  Элемент изображения в модальном окне */
+const userModalOpenElement = userModalElement.querySelector('.big-picture__img img');
+/** Кнопка для выхода из модального окна */
+const userModalCloseButton = userModalElement.querySelector('.big-picture__cancel');
 
-const body = document.querySelector('body');
+/** Кнопка "Загрузить ещё" в модальном окне */
+const buttonLoadNextComment = userModalElement.querySelector('.comments-loader');
+/** Элемент с текстом количества показанных комментариев в модальном окне */
+const showCommentCountElement = userModalElement.querySelector('.social__comment-shown-count');
+/** Элемент с текстом общего количества комментариев в модальном окне */
+const allCommentsElement = userModalElement.querySelector('.social__comment-total-count');
+/** Элемент с числом количества лайков в модальном окне */
+const likesCountElement = userModalElement.querySelector('.likes-count');
+/** Элемент с текстом описания к фотографии в модальном окне */
+const descriptionsUserModalElement = userModalElement.querySelector('.social__caption');
+/** Элемент списка комментариев */
+const commentListElement = document.querySelector('.social__comments');
+const commentElement = document.querySelector('#comment').content.querySelector('.social__comment');
 
-// const SHOW_COMMENT_COUNT = 2;
-
-const createNewComment = ({avatar, name, message}) => {
-  const newComment = document.createElement('li');
-  newComment.innerHTML = '<img class="social__picture" src="" alt="" width="35" height="35"><p class="social__text"></p>';
-  newComment.classList.add('social__comment');
-
-  newComment.querySelector('.social__picture').src = avatar;
-  newComment.querySelector('.social__picture').alt = name;
-  newComment.querySelector('.social__text').textContent = message;
-
-  return newComment;
-};
-
-const renderComments = (comments) => {
-  const commentListElement = document.querySelector('.social__comments');
-  commentListElement.innerHTML = '';
-
-  const fragment = document.createDocumentFragment();
-  comments.forEach((comment) => {
-    const commentElement = createNewComment(comment);
-    fragment.append(commentElement);
-  });
-
-  commentListElement.append(fragment);
-};
-
-const renderPhotoDetails = ({url, likes, description}) => {
-  const userModalOpenElement = userModalElement.querySelector('.big-picture__img img');
-  const likesCount = userModalElement.querySelector('.likes-count');
-  const descriptionsUserModalElement = userModalElement.querySelector('.social__caption');
-
-  userModalOpenElement.src = url;
-  userModalOpenElement.alt = description;
-  likesCount.textContent = likes;
-  descriptionsUserModalElement.textContent = description;
-};
+/** Количество "загружаемых" комментариев по нажатию кнопки "Загрузить ещё"*/
+const SHOW_COMMENT_COUNT = 5;
+/** Количество "загруженных" комментариев */
+let loadedCommentsCount = 0;
+let comments = [];
 
 const onWindowKeydown = (evt) => {
   if(isEscapeKey(evt)) {
@@ -49,53 +36,90 @@ const onWindowKeydown = (evt) => {
   }
 };
 
+const createNewCommentElement = ({avatar, name, message}) => {
+  const newComment = commentElement.cloneNode(true);
+
+  newComment.querySelector('.social__picture').src = avatar;
+  newComment.querySelector('.social__picture').alt = name;
+  newComment.querySelector('.social__text').textContent = message;
+
+  return newComment;
+};
+
+const renderComments = (items) => {
+
+  const fragment = document.createDocumentFragment();
+  items.forEach((item) => {
+    const newCommentElement = createNewCommentElement(item);
+    fragment.append(newCommentElement);
+  });
+
+  commentListElement.append(fragment);
+};
+
+const renderPhotoDetails = ({url, likes, description}) => {
+  userModalOpenElement.src = url;
+  userModalOpenElement.alt = description;
+  likesCountElement.textContent = likes;
+  descriptionsUserModalElement.textContent = description;
+  allCommentsElement.textContent = comments.length;
+};
+
+/** Загрузить следующие комментарии */
+const loadNextComments = () => {
+  // Определим номер крайнийнего комментария, который собираемся "загрузить" с проверкой на переполнение
+  let nextLoadedCommentsCount = loadedCommentsCount + SHOW_COMMENT_COUNT;
+
+  if(nextLoadedCommentsCount >= comments.length) {
+    nextLoadedCommentsCount = comments.length;
+
+    // Скроем кнопку "Загрузить ещё", если количество загруженных равно количеству всех комментариев
+    buttonLoadNextComment.classList.add('hidden');
+  } else {
+    buttonLoadNextComment.classList.remove('hidden');
+  }
+
+  // Отрисуем следующие по порядку элементы
+  renderComments(comments.slice(loadedCommentsCount, nextLoadedCommentsCount));
+
+  // Обновим номер крайнийнего комментария
+  loadedCommentsCount = nextLoadedCommentsCount;
+  showCommentCountElement.textContent = nextLoadedCommentsCount;
+};
+
 const openUserModal = () => {
-  body.classList.add('modal-open');
+  bodyElement.classList.add('modal-open');
   userModalElement.classList.remove('hidden');
 
   document.addEventListener('keydown', onWindowKeydown);
+  buttonLoadNextComment.addEventListener('click', loadNextComments);
+
+  commentListElement.innerHTML = '';
+  loadedCommentsCount = 0;
 };
 
 const closeUserModal = () => {
-  body.classList.remove('modal-open');
+  bodyElement.classList.remove('modal-open');
   userModalElement.classList.add('hidden');
 
   document.removeEventListener('keydown', onWindowKeydown);
+  buttonLoadNextComment.removeEventListener('click', loadNextComments);
 };
 
-const initUserModal = (photos) => {
-  const thumbnails = document.querySelector('.pictures');
+const initUserModal = (photo) => {
+  comments = photo.comments;
 
-  thumbnails.addEventListener('click', (evt) => {
-    if(evt.target.matches('img')){
-      openUserModal();
+  // Показываем модальное окно с переданным обработчиком нажатия кнопки "Загрузить ещё"
+  openUserModal();
 
-      const thumbnail = evt.target.closest('.picture');
-      const url = evt.target.src;
-      const showCommentCount = userModalElement.querySelector('.social__comment-shown-count');
-      showCommentCount.textContent = thumbnail.querySelector('.picture__comments').textContent;
+  // Обновляем информацию о изображении в модальном окне
+  renderPhotoDetails(photo);
 
-      const allComments = userModalElement.querySelector('.social__comment-total-count');
-      allComments.textContent = thumbnail.querySelector('.picture__comments').textContent;
+  // Один раз вызываем эту функицию сами для загрузки первых комментариев, потом будет вызваться по нажатию кнопки
+  loadNextComments();
 
-      photos.forEach((photo) => {
-        if(url.indexOf(photo.url) > -1) {
-          renderPhotoDetails(photo);
-          renderComments(photo.comments);
-        }
-      });
-
-      const commentCountElement = userModalElement.querySelector('.social__comment-count');
-      commentCountElement.classList.add('hidden');
-
-      const commentsLoadButton = userModalElement.querySelector('.comments-loader');
-      commentsLoadButton.classList.add('hidden');
-    }
-  });
-
-  const userModalCloseElement = userModalElement.querySelector('.big-picture__cancel');
-
-  userModalCloseElement.addEventListener('click', () => {
+  userModalCloseButton.addEventListener('click', () => {
+    // Скрываем модальное окно и, передав тот же обработчик нажатия кнопки "Загрузить ещё", который добавляли, отписываемся от него
     closeUserModal();
   });
 };

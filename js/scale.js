@@ -13,13 +13,13 @@ const scalePhoto = (value) => {
   scaleElement.value = `${value}%`;
 };
 
-const currentValue = parseInt(scaleElement.value, 10);
-
 const onButtonSmallerClick = () => {
+  const currentValue = parseInt(scaleElement.value, 10);
   scalePhoto(Math.max(currentValue - SCALE_STEP, MIN_SCALE));
 };
 
 const onButtonBiggerClick = () => {
+  const currentValue = parseInt(scaleElement.value, 10);
   scalePhoto(Math.min(currentValue + SCALE_STEP, MAX_SCALE));
 };
 

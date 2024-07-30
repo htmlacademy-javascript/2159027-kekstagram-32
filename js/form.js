@@ -60,7 +60,6 @@ const onCancelButtonClick = () => {
 };
 
 const onFormSubmit = (evt) => {
-//   evt.preventDefault();
   if (!pristine.validate()) {
     evt.preventDefault();
   }

@@ -1,4 +1,6 @@
 import {isEscapeKey} from './util.js';
+import {resetScale} from './scale.js';
+import {resetEffects} from './effects.js';
 
 const form = document.querySelector('.img-upload__form');
 const fileField = document.querySelector('#upload-file');
@@ -32,6 +34,8 @@ const showFormModal = () => {
 
 const hideFormModal = () => {
   form.reset();
+  resetScale();
+  resetEffects();
   pristine.reset();
   formUpload.classList.add('hidden');
   bodyElement.classList.remove('modal-open');
@@ -60,7 +64,6 @@ const onCancelButtonClick = () => {
 };
 
 const onFormSubmit = (evt) => {
-//   evt.preventDefault();
   if (!pristine.validate()) {
     evt.preventDefault();
   }
@@ -89,6 +92,7 @@ pristine.addValidator(commentField, isCommentLengthValid, commentErorr);
 
 hashtagField.addEventListener('keydown', onInputKeydownEscape);
 commentField.addEventListener('keydown', onInputKeydownEscape);
+
 fileField.addEventListener('change', onNewFileUpload);
 cancelButton.addEventListener('click', onCancelButtonClick);
 form.addEventListener('submit', onFormSubmit);

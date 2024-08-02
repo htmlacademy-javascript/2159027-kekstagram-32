@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="vendor/nouislider/nouislider.css">
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -33,7 +34,7 @@
           <h2 class="img-upload__title  visually-hidden">Загрузка фотографии</h2>
           <form class="img-upload__form" method="post" enctype="multipart/form-data" action="https://32.javascript.htmlacademy.pro/kekstagram" id="upload-select-image" autocomplete="off">
 
-            <!-- Изначальное состояние поля для загрузки изображения -->
+            <!-- Изначальное состояние поля для загрузки изображенsliия -->
             <fieldset class="img-upload__start">
               <input type="file" id="upload-file" class="img-upload__input  visually-hidden" name="filename" required>
               <label for="upload-file" class="img-upload__label  img-upload__control">Загрузить</label>
@@ -244,6 +245,7 @@
   </template>
 
   <script src="vendor/pristine/pristine.min.js"></script>
+  <script src="vendor/nouislider/nouislider.js"></script>
   <script src="js/functions.js"></script>
   <script src="js/main.js" type="module"></script>
 

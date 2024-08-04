@@ -1,6 +1,7 @@
-import {isEscapeKey} from './util.js';
+import {isEscapeKey, showAlert} from './util.js';
 import {resetScale} from './scale.js';
 import {resetEffects} from './effects.js';
+import {sendData} from './api.js';
 
 const form = document.querySelector('.img-upload__form');
 const fileField = document.querySelector('#upload-file');
@@ -9,6 +10,7 @@ const bodyElement = document.querySelector('body');
 const cancelButton = document.querySelector('#upload-cancel');
 const hashtagField = form.querySelector('.text__hashtags');
 const commentField = form.querySelector('.text__description');
+const buttonSubmit = document.querySelector('.img-upload__submit');
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAG_COUNT = 5;
@@ -19,6 +21,11 @@ const hashtagErrors = {
   NOT_UNIQUE: 'Хэштеги не должны повторяться',
 };
 const commentErorr = 'Максимальная длина комментария 140 символов';
+
+const buttonSubmitText = {
+  IDLE: 'Отправить',
+  SENDING: 'Отправляю...'
+};
 
 const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
@@ -62,12 +69,34 @@ const onNewFileUpload = () => {
 const onCancelButtonClick = () => {
   hideFormModal();
 };
-
-const onFormSubmit = (evt) => {
-  if (!pristine.validate()) {
-    evt.preventDefault();
-  }
+const blockButtonSubmit = () => {
+  buttonSubmit.disabled = true;
+  buttonSubmit.textContent = buttonSubmitText.SENDING;
 };
+
+const unblockButtonSubmit = () => {
+  buttonSubmit.disabled = false;
+  buttonSubmit.textContent = buttonSubmitText.IDLE;
+};
+
+const setUserFormSubmit = (onSuccess) => {
+  form.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    const isValid = pristine.validate();
+    if (isValid) {
+      blockButtonSubmit();
+      sendData(new FormData(evt.target))
+        .then(onSuccess)
+        .catch(
+          (err) => {
+            showAlert(err.message);
+          }
+        )
+        .finally(unblockButtonSubmit);
+    }
+  });
+};
+
 
 const prepareHashtags = (inputTag) => inputTag.trim().split(' ').filter((tag) => tag.length > 0);
 
@@ -95,4 +124,5 @@ commentField.addEventListener('keydown', onInputKeydownEscape);
 
 fileField.addEventListener('change', onNewFileUpload);
 cancelButton.addEventListener('click', onCancelButtonClick);
-form.addEventListener('submit', onFormSubmit);
+
+export {setUserFormSubmit, hideFormModal};

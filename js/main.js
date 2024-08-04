@@ -1,6 +1,6 @@
 import { renderGallery } from './gallery.js';
 import { showAlert } from './util.js';
-import './form.js';
+import {setUserFormSubmit, hideFormModal} from './upload-form.js';
 import {getData} from './api.js';
 import './message.js';
 
@@ -13,3 +13,5 @@ getData()
       showAlert(err.message);
     }
   );
+
+setUserFormSubmit(hideFormModal);

@@ -1,6 +1,15 @@
-import { getPhoto } from './data.js';
 import { renderGallery } from './gallery.js';
+import { showAlert } from './util.js';
 import './form.js';
+import {getData} from './api.js';
+import './message.js';
 
-renderGallery(getPhoto());
-
+getData()
+  .then((photos) => {
+    renderGallery(photos);
+  })
+  .catch(
+    (err) => {
+      showAlert(err.message);
+    }
+  );

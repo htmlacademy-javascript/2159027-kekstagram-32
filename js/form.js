@@ -50,7 +50,7 @@ function onEscKeyDown (evt) {
 }
 
 function onInputKeydownEscape (evt) {
-  if (evt.key === 'Escape') {
+  if (isEscapeKey(evt)) {
     evt.stopPropagation();
   }
 }

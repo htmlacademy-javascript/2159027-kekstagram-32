@@ -1,6 +1,8 @@
 import {isEscapeKey} from './util.js';
 import {resetScale} from './scale.js';
 import {resetEffects} from './effects.js';
+import {sendData} from './api.js';
+import {showErrorMessage, showSuccessMessage} from './message.js';
 
 const form = document.querySelector('.img-upload__form');
 const fileField = document.querySelector('#upload-file');
@@ -9,6 +11,7 @@ const bodyElement = document.querySelector('body');
 const cancelButton = document.querySelector('#upload-cancel');
 const hashtagField = form.querySelector('.text__hashtags');
 const commentField = form.querySelector('.text__description');
+const buttonSubmit = document.querySelector('.img-upload__submit');
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAG_COUNT = 5;
@@ -19,6 +22,11 @@ const hashtagErrors = {
   NOT_UNIQUE: 'Хэштеги не должны повторяться',
 };
 const commentErorr = 'Максимальная длина комментария 140 символов';
+
+const buttonSubmitText = {
+  IDLE: 'Отправить',
+  SENDING: 'Отправляю...'
+};
 
 const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
@@ -50,7 +58,7 @@ function onEscKeyDown (evt) {
 }
 
 function onInputKeydownEscape (evt) {
-  if (evt.key === 'Escape') {
+  if (isEscapeKey(evt)) {
     evt.stopPropagation();
   }
 }
@@ -62,11 +70,34 @@ const onNewFileUpload = () => {
 const onCancelButtonClick = () => {
   hideFormModal();
 };
+const blockButtonSubmit = () => {
+  buttonSubmit.disabled = true;
+  buttonSubmit.textContent = buttonSubmitText.SENDING;
+};
 
-const onFormSubmit = (evt) => {
-  if (!pristine.validate()) {
+const unblockButtonSubmit = () => {
+  buttonSubmit.disabled = false;
+  buttonSubmit.textContent = buttonSubmitText.IDLE;
+};
+
+const setUserFormSubmit = async (onSuccess) => {
+  form.addEventListener('submit', async (evt) => {
     evt.preventDefault();
-  }
+    const isValid = pristine.validate();
+    if (isValid) {
+      blockButtonSubmit();
+
+      await sendData(new FormData(evt.target))
+        .then(onSuccess)
+        .catch(showErrorMessage)
+        .finally(unblockButtonSubmit);
+    }
+  });
+};
+
+const successHandler = () => {
+  hideFormModal();
+  showSuccessMessage();
 };
 
 const prepareHashtags = (inputTag) => inputTag.trim().split(' ').filter((tag) => tag.length > 0);
@@ -95,4 +126,5 @@ commentField.addEventListener('keydown', onInputKeydownEscape);
 
 fileField.addEventListener('change', onNewFileUpload);
 cancelButton.addEventListener('click', onCancelButtonClick);
-form.addEventListener('submit', onFormSubmit);
+
+export {setUserFormSubmit, hideFormModal, successHandler};

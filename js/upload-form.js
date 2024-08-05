@@ -1,7 +1,8 @@
-import {isEscapeKey, showAlert} from './util.js';
+import {isEscapeKey} from './util.js';
 import {resetScale} from './scale.js';
 import {resetEffects} from './effects.js';
 import {sendData} from './api.js';
+import {showErrorMessage, showSuccessMessage} from './message.js';
 
 const form = document.querySelector('.img-upload__form');
 const fileField = document.querySelector('#upload-file');
@@ -79,24 +80,25 @@ const unblockButtonSubmit = () => {
   buttonSubmit.textContent = buttonSubmitText.IDLE;
 };
 
-const setUserFormSubmit = (onSuccess) => {
-  form.addEventListener('submit', (evt) => {
+const setUserFormSubmit = async (onSuccess) => {
+  form.addEventListener('submit', async (evt) => {
     evt.preventDefault();
     const isValid = pristine.validate();
     if (isValid) {
       blockButtonSubmit();
-      sendData(new FormData(evt.target))
+
+      await sendData(new FormData(evt.target))
         .then(onSuccess)
-        .catch(
-          (err) => {
-            showAlert(err.message);
-          }
-        )
+        .catch(showErrorMessage)
         .finally(unblockButtonSubmit);
     }
   });
 };
 
+const successHandler = () => {
+  hideFormModal();
+  showSuccessMessage();
+};
 
 const prepareHashtags = (inputTag) => inputTag.trim().split(' ').filter((tag) => tag.length > 0);
 
@@ -125,4 +127,4 @@ commentField.addEventListener('keydown', onInputKeydownEscape);
 fileField.addEventListener('change', onNewFileUpload);
 cancelButton.addEventListener('click', onCancelButtonClick);
 
-export {setUserFormSubmit, hideFormModal};
+export {setUserFormSubmit, hideFormModal, successHandler};

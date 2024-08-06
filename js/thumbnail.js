@@ -22,4 +22,11 @@ const generateThumbnailItems = (photos, thumbnailList) => {
   thumbnailList.append(thumbnailFragment);
 };
 
-export {generateThumbnailItems};
+const removeThumbnailItems = (thumbnailList) => {
+  const photos = Array.from(thumbnailList.querySelectorAll('.picture'));
+  photos.forEach((photo) => {
+    photo.remove();
+  });
+};
+
+export {generateThumbnailItems, removeThumbnailItems};

@@ -5,13 +5,15 @@ import {sendData} from './api.js';
 import {showErrorMessage, showSuccessMessage} from './message.js';
 
 const form = document.querySelector('.img-upload__form');
-const fileField = document.querySelector('#upload-file');
+const fileField = document.querySelector('.img-upload__start input[type=file]');
 const formUpload = document.querySelector('.img-upload__overlay');
 const bodyElement = document.querySelector('body');
 const cancelButton = document.querySelector('#upload-cancel');
 const hashtagField = form.querySelector('.text__hashtags');
 const commentField = form.querySelector('.text__description');
 const buttonSubmit = document.querySelector('.img-upload__submit');
+
+const photoUploadPreview = document.querySelector('.img-upload__preview img');
 
 const MAX_COMMENT_LENGTH = 140;
 const MAX_HASHTAG_COUNT = 5;
@@ -22,6 +24,7 @@ const hashtagErrors = {
   NOT_UNIQUE: 'Хэштеги не должны повторяться',
 };
 const commentErorr = 'Максимальная длина комментария 140 символов';
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const buttonSubmitText = {
   IDLE: 'Отправить',
@@ -64,6 +67,7 @@ function onInputKeydownEscape (evt) {
 }
 
 const onNewFileUpload = () => {
+  uploadPhoto();
   showFormModal();
 };
 
@@ -94,6 +98,17 @@ const setUserFormSubmit = async (onSuccess) => {
     }
   });
 };
+
+function uploadPhoto() {
+  const file = fileField.files[0];
+  const fileName = file.name.toLowerCase();
+
+  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+  if (matches) {
+    photoUploadPreview.src = URL.createObjectURL(file);
+    photoUploadPreview.style.background = `url('${photoUploadPreview.src}')`;
+  }
+}
 
 const successHandler = () => {
   hideFormModal();

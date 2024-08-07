@@ -1,4 +1,4 @@
-import { generateThumbnailItems } from './thumbnail.js';
+import { generateThumbnailItems, removeThumbnailItems } from './thumbnail.js';
 import { initUserModal } from './user-modal.js';
 
 const thumbnailList = document.querySelector('.pictures');
@@ -18,7 +18,8 @@ const renderGallery = (photos) => {
     initUserModal(photo);
   });
 
+  removeThumbnailItems(thumbnailList);
   generateThumbnailItems(photos, thumbnailList);
 };
 
-export { renderGallery };
+export { renderGallery};

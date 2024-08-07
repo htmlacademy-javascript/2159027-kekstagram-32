@@ -1,3 +1,5 @@
+import { debounce } from './util.js';
+
 const PHOTO_COUNT = 10;
 const Filters = {
   DEFAULT: 'filter-default',
@@ -10,7 +12,7 @@ let currentFilter = Filters.DEFAULT;
 
 const setOnFilterClick = (render, photos) => {
   filterPhotoElement.classList.remove('img-filters--inactive');
-  filterPhotoElement.addEventListener('click', (evt) => {
+  filterPhotoElement.addEventListener('click', debounce((evt) => {
     const filterPhotoItem = evt.target.closest('.img-filters__button');
     if(!filterPhotoItem) {
       return;
@@ -34,7 +36,7 @@ const setOnFilterClick = (render, photos) => {
         render(photos);
         break;
     }
-  });
+  }));
 };
 
 const buttons = Array.from(document.querySelectorAll('.img-filters__button'));

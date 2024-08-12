@@ -33,6 +33,7 @@ const onWindowKeydown = (evt) => {
   if(isEscapeKey(evt)) {
     evt.preventDefault();
     userModalElement.classList.add('hidden');
+    bodyElement.classList.remove('modal-open');
   }
 };
 

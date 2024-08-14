@@ -41,6 +41,7 @@ function onBodyClick(evt) {
 function onEscKeyDown(evt) {
   if (isEscapeKey) {
     evt.preventDefault();
+    evt.stopPropagation();
     onDeleteMessage();
   }
 }

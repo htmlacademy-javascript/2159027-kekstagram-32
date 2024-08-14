@@ -12,6 +12,7 @@ const cancelButton = document.querySelector('#upload-cancel');
 const hashtagField = form.querySelector('.text__hashtags');
 const commentField = form.querySelector('.text__description');
 const buttonSubmit = document.querySelector('.img-upload__submit');
+const previewEffectsElement = document.querySelectorAll('.effects__preview');
 
 const photoUploadPreview = document.querySelector('.img-upload__preview img');
 
@@ -74,6 +75,7 @@ const onNewFileUpload = () => {
 const onCancelButtonClick = () => {
   hideFormModal();
 };
+
 const blockButtonSubmit = () => {
   buttonSubmit.disabled = true;
   buttonSubmit.textContent = buttonSubmitText.SENDING;
@@ -84,16 +86,18 @@ const unblockButtonSubmit = () => {
   buttonSubmit.textContent = buttonSubmitText.IDLE;
 };
 
-const setUserFormSubmit = async (onSuccess) => {
-  form.addEventListener('submit', async (evt) => {
+const setUserFormSubmit = () => {
+  form.addEventListener('submit', (evt) => {
     evt.preventDefault();
     const isValid = pristine.validate();
     if (isValid) {
       blockButtonSubmit();
 
-      await sendData(new FormData(evt.target))
-        .then(onSuccess)
-        .catch(showErrorMessage)
+      sendData(new FormData(evt.target))
+        .then(() => successHandler())
+        .catch (() => {
+          showErrorMessage();
+        })
         .finally(unblockButtonSubmit);
     }
   });
@@ -106,14 +110,16 @@ function uploadPhoto() {
   const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
   if (matches) {
     photoUploadPreview.src = URL.createObjectURL(file);
-    photoUploadPreview.style.background = `url('${photoUploadPreview.src}')`;
+    previewEffectsElement.forEach((preview) => {
+      preview.style.backgroundImage = `url('${photoUploadPreview.src}')`;
+    });
   }
 }
 
-const successHandler = () => {
+function successHandler() {
   hideFormModal();
-  showSuccessMessage();
-};
+  showSuccessMessage(unblockButtonSubmit);
+}
 
 const prepareHashtags = (inputTag) => inputTag.trim().split(' ').filter((tag) => tag.length > 0);
 
@@ -142,4 +148,4 @@ commentField.addEventListener('keydown', onInputKeydownEscape);
 fileField.addEventListener('change', onNewFileUpload);
 cancelButton.addEventListener('click', onCancelButtonClick);
 
-export {setUserFormSubmit, hideFormModal, successHandler};
+export {setUserFormSubmit, hideFormModal};

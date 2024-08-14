@@ -22,4 +22,4 @@ const renderGallery = (photos) => {
   generateThumbnailItems(photos, thumbnailList);
 };
 
-export { renderGallery};
+export { renderGallery };

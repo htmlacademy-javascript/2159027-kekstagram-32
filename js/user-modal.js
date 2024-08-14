@@ -32,8 +32,7 @@ let comments = [];
 const onWindowKeydown = (evt) => {
   if(isEscapeKey(evt)) {
     evt.preventDefault();
-    userModalElement.classList.add('hidden');
-    bodyElement.classList.remove('modal-open');
+    closeUserModal();
   }
 };
 
@@ -67,7 +66,7 @@ const renderPhotoDetails = ({url, likes, description}) => {
 };
 
 /** Загрузить следующие комментарии */
-const loadNextComments = () => {
+const onLoadNextComments = () => {
   // Определим номер крайнийнего комментария, который собираемся "загрузить" с проверкой на переполнение
   let nextLoadedCommentsCount = loadedCommentsCount + SHOW_COMMENT_COUNT;
 
@@ -93,19 +92,25 @@ const openUserModal = () => {
   userModalElement.classList.remove('hidden');
 
   document.addEventListener('keydown', onWindowKeydown);
-  buttonLoadNextComment.addEventListener('click', loadNextComments);
+  buttonLoadNextComment.addEventListener('click', onLoadNextComments);
 
   commentListElement.innerHTML = '';
   loadedCommentsCount = 0;
 };
 
-const closeUserModal = () => {
+function closeUserModal() {
   bodyElement.classList.remove('modal-open');
   userModalElement.classList.add('hidden');
 
   document.removeEventListener('keydown', onWindowKeydown);
-  buttonLoadNextComment.removeEventListener('click', loadNextComments);
-};
+  buttonLoadNextComment.removeEventListener('click', onLoadNextComments);
+  userModalCloseButton.removeEventListener('click', onUserModalCloseButton);
+}
+
+function onUserModalCloseButton() {
+  // Скрываем модальное окно и, передав тот же обработчик нажатия кнопки "Загрузить ещё", который добавляли, отписываемся от него
+  closeUserModal();
+}
 
 const initUserModal = (photo) => {
   comments = photo.comments;
@@ -117,12 +122,9 @@ const initUserModal = (photo) => {
   renderPhotoDetails(photo);
 
   // Один раз вызываем эту функицию сами для загрузки первых комментариев, потом будет вызваться по нажатию кнопки
-  loadNextComments();
+  onLoadNextComments();
 
-  userModalCloseButton.addEventListener('click', () => {
-    // Скрываем модальное окно и, передав тот же обработчик нажатия кнопки "Загрузить ещё", который добавляли, отписываемся от него
-    closeUserModal();
-  });
+  userModalCloseButton.addEventListener('click', onUserModalCloseButton);
 };
 
 export {initUserModal};
